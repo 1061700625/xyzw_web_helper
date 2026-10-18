@@ -4866,9 +4866,9 @@ const executeScheduledTask = async (task) => {
     // Always use the latest selectedTokens from the task that exist in current tokens.value
     selectedTokens.value = [...availableTokens];
 
-    // Execute selected tasks in parallel
-    const taskPromises = task.selectedTasks.map(async (taskName) => {
-      if (shouldStop.value) return;
+    // Task types share account connections and run state; account-level concurrency stays inside each task.
+    for (const taskName of task.selectedTasks) {
+      if (shouldStop.value) break;
 
       if (
         ["batchbaoku45", "batchbaoku13"].includes(taskName) &&
@@ -4879,7 +4879,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在宝库开放时间)`,
           type: "warning",
         });
-        return;
+        continue;
       }
 
       if (
@@ -4891,7 +4891,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在梦境开放时间)`,
           type: "warning",
         });
-        return;
+        continue;
       }
 
       if (
@@ -4903,7 +4903,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在竞技场开放时间)`,
           type: "warning",
         });
-        return;
+        continue;
       }
 
       if (
@@ -4920,7 +4920,7 @@ const executeScheduledTask = async (task) => {
           message: `跳过任务: ${availableTasks.find((t) => t.value === taskName)?.label || taskName} (不在怪异塔开放时间)`,
           type: "warning",
         });
-        return;
+        continue;
       }
 
       addLog({
@@ -4956,10 +4956,7 @@ const executeScheduledTask = async (task) => {
           type: "error",
         });
       }
-    });
-
-    // Wait for all tasks to complete
-    await Promise.all(taskPromises);
+    }
 
     addLog({
       time: new Date().toLocaleTimeString(),
