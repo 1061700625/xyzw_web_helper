@@ -176,5 +176,5 @@ dist
 .vscode/
 CHANGELOG.md
 LOCAL_TOKEN_CHANGES.md
-test/
+/test/
 docs/
